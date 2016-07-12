@@ -10201,7 +10201,7 @@ if (typeof exports !== 'undefined') {
     "use strict"
 
     //auto invoke function to bind our own copy of window and undefined
-    
+
     //set up namespaces for modules
     window.webgazer = window.webgazer || {};
     webgazer.tracker = webgazer.tracker || {};
@@ -10209,12 +10209,12 @@ if (typeof exports !== 'undefined') {
     webgazer.params = webgazer.params || {};
 
     //PRIVATE VARIABLES
-    
+
     //video elements
     webgazer.params.videoScale = 1;
     var videoElement = null;
     var videoElementCanvas = null;
-    webgazer.params.videoElementId = 'webgazerVideoFeed'; 
+    webgazer.params.videoElementId = 'webgazerVideoFeed';
     webgazer.params.videoElementCanvasId = 'webgazerVideoCanvas';
     webgazer.params.imgWidth = 1280;
     webgazer.params.imgHeight = 720;
@@ -10232,10 +10232,10 @@ if (typeof exports !== 'undefined') {
     gazeDot.style.display = 'none';
 
     var debugVideoLoc = '';
-        
+
     // loop parameters
     var clockStart = performance.now();
-    webgazer.params.dataTimestep = 50; 
+    webgazer.params.dataTimestep = 50;
     var paused = false;
     //registered callback for loop
     var nopCallback = function(data, time) {};
@@ -10244,7 +10244,7 @@ if (typeof exports !== 'undefined') {
     //Types that regression systems should handle
     //Describes the source of data so that regression systems may ignore or handle differently the various generating events
     var eventTypes = ['click', 'move'];
-    
+
 
     //movelistener timeout clock parameters
     var moveClock = performance.now();
@@ -10282,7 +10282,7 @@ if (typeof exports !== 'undefined') {
 
     /**
      * gets the pupil features by following the pipeline which threads an eyes object through each call:
-     * curTracker gets eye patches -> blink detector -> pupil detection 
+     * curTracker gets eye patches -> blink detector -> pupil detection
      * @param {Canvas} canvas - a canvas which will have the video drawn onto it
      * @param {number} width - the width of canvas
      * @param {number} height - the height of canvas
@@ -10309,7 +10309,7 @@ if (typeof exports !== 'undefined') {
     function paintCurrentFrame(canvas, width, height) {
         //imgWidth = videoElement.videoWidth * videoScale;
         //imgHeight = videoElement.videoHeight * videoScale;
-        if (canvas.width != width) { 
+        if (canvas.width != width) {
             canvas.width = width;
         }
         if (canvas.height != height) {
@@ -10418,8 +10418,8 @@ if (typeof exports !== 'undefined') {
         }
     }
 
-    /** loads the global data and passes it to the regression model 
-     * 
+    /** loads the global data and passes it to the regression model
+     *
      */
     function loadGlobalData() {
         var storage = JSON.parse(window.localStorage.getItem(localstorageLabel)) || defaults;
@@ -10429,7 +10429,7 @@ if (typeof exports !== 'undefined') {
             regs[reg].setData(storage.data);
         }
     }
-   
+
    /**
     * constructs the global storage object and adds it to localstorage
     */
@@ -10459,16 +10459,16 @@ if (typeof exports !== 'undefined') {
      */
     function init(videoSrc) {
         videoElement = document.createElement('video');
-        videoElement.id = webgazer.params.videoElementId; 
+        videoElement.id = webgazer.params.videoElementId;
         videoElement.autoplay = true;
         console.log(videoElement);
         videoElement.style.display = 'none';
 
-        //turn the stream into a magic URL 
-        videoElement.src = videoSrc;  
+        //turn the stream into a magic URL
+        videoElement.src = videoSrc;
         document.body.appendChild(videoElement);
 
-        videoElementCanvas = document.createElement('canvas'); 
+        videoElementCanvas = document.createElement('canvas');
         videoElementCanvas.id = webgazer.params.videoElementCanvasId;
         videoElementCanvas.style.display = 'none';
         document.body.appendChild(videoElementCanvas);
@@ -10476,8 +10476,8 @@ if (typeof exports !== 'undefined') {
 
         //third argument set to true so that we get event on 'capture' instead of 'bubbling'
         //this prevents a client using event.stopPropagation() preventing our access to the click
-        document.addEventListener('click', clickListener, true);
-        document.addEventListener('mousemove', moveListener, true);
+//        document.addEventListener('click', clickListener, true);
+//        document.addEventListener('mousemove', moveListener, true);
 
         document.body.appendChild(gazeDot);
 
@@ -10507,18 +10507,18 @@ if (typeof exports !== 'undefined') {
             navigator.webkitGetUserMedia ||
             navigator.mozGetUserMedia;
 
-        if(navigator.getUserMedia != null){ 
-            var options = { 
-                video:true, 
-            }; 	     
-            //request webcam access 
-            navigator.getUserMedia(options, 
+        if(navigator.getUserMedia != null){
+            var options = {
+                video:true,
+            };
+            //request webcam access
+            navigator.getUserMedia(options,
                     function(stream){
                         console.log('video stream created');
-                        init(window.URL.createObjectURL(stream));                    
-                    }, 
-                    function(e){ 
-                        console.log("No stream"); 
+                        init(window.URL.createObjectURL(stream));
+                    },
+                    function(e){
+                        console.log("No stream");
                         videoElement = null;
                     });
         }
@@ -10631,7 +10631,7 @@ if (typeof exports !== 'undefined') {
             }
             return webgazer;
         }
-        curTracker = curTrackerMap[name]();    
+        curTracker = curTrackerMap[name]();
         return webgazer;
     }
 
@@ -10720,7 +10720,7 @@ if (typeof exports !== 'undefined') {
     webgazer.getTracker = function() {
         return curTracker;
     }
-    
+
     /**
      * returns the regression currently in use
      * @return {Array{regression}} an array of objects following the regression interface
@@ -10734,15 +10734,32 @@ if (typeof exports !== 'undefined') {
      * @return {object} prediction data object
      */
     webgazer.getCurrentPrediction = function() {
-        return getPrediction(); 
+        return getPrediction();
     }
 
     /**
      * returns the different event types that may be passed to regressions when calling regression.addData()
      * @return {array} array of strings where each string is an event type
      */
-    webgazer.params.getEventTypes = function() { 
-        return eventTypes.slice(); 
+    webgazer.params.getEventTypes = function() {
+        return eventTypes.slice();
+    }
+
+    /**
+     * records calibration data and passes it to the regression model
+     */
+    webgazer.addCalibrationData = function(x, y) {
+        if (paused) {
+            return;
+        }
+        var features = getPupilFeatures(videoElementCanvas, webgazer.params.imgWidth, webgazer.params.imgHeight);
+        if (regs.length == 0) {
+            console.log('regression not set, call setRegression()');
+            return null;
+        }
+        for (var reg in regs) {
+            regs[reg].addData(features, [x, y], eventTypes[0]); // eventType[0] === 'click'
+        }
     }
 }(window));
 ;
